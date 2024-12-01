@@ -1,0 +1,12 @@
+[project]
+name = "advent-of-code-2024"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "advent-of-code-data>=2.0.4",
+    "beautifulsoup4>=4.12.3",
+    "jinja2>=3.1.4",
+    "typer>=0.14.0",
+]

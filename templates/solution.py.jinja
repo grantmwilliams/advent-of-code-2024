@@ -1,0 +1,112 @@
+from rich import print as rprint
+from rich.text import Text
+from rich.panel import Panel
+from rich.console import Console
+
+from aocd import submit
+from aocd.examples import Example
+from aocd.models import Puzzle
+
+
+console = Console()
+
+def part1(data: str) -> str:
+    """Solution for part 1"""
+    return f"{-1}"
+
+def part2(data: str) -> str:
+    """Solution for part 2"""
+    return f"{-1}"
+
+def test_solution(part: int, example: Example) -> bool:
+    """Test a solution function against example data with rich output"""
+    result = str(part1(example.input_data)) if part == 1 else str(part2(example.input_data))
+    expected = example.answer_a if part == 1 else example.answer_b
+      
+    # Create a panel for the result
+    if result == expected:
+        result_text = Text(f"[✓] Part {part}: {result}", "green")
+    else:
+        result_text = Text.assemble(
+            ("[✗] Part ", "red"),
+            (f"{part}", "red"),
+            (f": {result} ", "red"),
+            ("\n[Expected: ", "yellow"),
+            (f"{expected}", "yellow bold"),
+            ("]", "yellow"),
+        )
+    
+    panel = Panel(
+        result_text,
+        title=f"Example Test {part}",
+        border_style="bright_black",
+    )
+    console.print(panel)
+    
+    return result == expected
+
+def submit_solutions(submit_part1: bool, submit_part2: bool, puzzle: Puzzle) -> None:
+    """Submit a solution to the puzzle"""
+    console.rule("[bold blue]Running Part 1 Solution")
+    if puzzle.answered_a:
+        with console.status("[bold blue]Part 1 already solved"):
+            rprint(f"[bold green][✓][/bold green] [green]Part 1: {puzzle.answer_a}[/green]")
+    elif submit_part1:
+        with console.status("[bold green]Solving part 1..."):
+            result = part1(puzzle.input_data)
+            rprint(f"\n[cyan]Part 1 result:[/cyan] [yellow]{result}[/yellow]")
+            submit(result, part="a", day=puzzle.day, year=puzzle.year)
+
+    if puzzle.answered_b:
+        with console.status("[bold blue]Part 2 already solved"):
+            rprint(f"[bold green][✓][/bold green] [green]Part 2: {puzzle.answer_b}[/green]")
+    elif submit_part2:
+        with console.status("[bold green]Solving part 2..."):
+            result = part2(puzzle.input_data)
+            rprint(f"\n[cyan]Part 2 result:[/cyan] [yellow]{result}[/yellow]")
+            submit(result, part="b", day=puzzle.day, year=puzzle.year)
+
+
+if __name__ == "__main__":
+    year = {{ year }}
+    day = {{ day }}
+    puzzle = Puzzle(year=year, day=day)
+    data = puzzle.input_data
+
+    part1_correct = True
+    part2_correct = True
+    
+    # Test examples if available
+    if puzzle.examples:
+        console.rule("[bold blue]Part 1")
+        for idx, example in enumerate(puzzle.examples, start=1):
+            console.print(f"\n[bold cyan]Example {idx}:")
+            part1_result = test_solution(1, example)
+            part1_correct = part1_correct and part1_result
+        
+        if part1_correct:
+            console.print("\n[bold green]All Part 1 tests passed! (*)[/bold green]")
+        else:
+            console.print("\n[bold red]Some Part 1 tests failed (x)[/bold red]")
+
+        console.rule("[bold blue]Part 2")
+        for idx, example in enumerate(puzzle.examples, start=1):
+            console.print(f"\n[bold cyan]Example {idx}:")
+            
+            if hasattr(example, "answer_b") and example.answer_b is not None:
+                part2_result = test_solution(2, example)
+                part2_correct = part2_correct and part2_result
+            else:
+                console.print(Panel(
+                    Text("[🔒] Part 2 examples not yet available", "yellow"),
+                    title="Example Test 2",
+                    border_style="bright_black"
+                ))
+                part2_correct = False
+                
+        if part2_correct:
+            console.print("\n[bold green]All Part 2 tests passed! (*)[/bold green]")
+        else:
+            console.print("\n[bold yellow]Part 2 not available yet[/bold yellow]")
+
+    submit_solutions(part1_correct, part2_correct, puzzle)
